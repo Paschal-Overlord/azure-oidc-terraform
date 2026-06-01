@@ -1,0 +1,58 @@
+# -----------------------------------------------------------------------------
+# terraform.tfvars — copy from terraform.tfvars.example, never commit this file
+# -----------------------------------------------------------------------------
+
+github_org              = "<your-github-org>"
+keyvault_name           = "<your-keyvault-name>"
+keyvault_resource_group = "<your-resource-group>"
+
+# Branches used across all groups unless a group overrides it
+default_branches = ["main"]
+
+# -----------------------------------------------------------------------------
+# Split repos into groups to stay under Azure AD's 20 federated creds limit.
+# Each group = one App Registration. Keep each group under:
+#   - 18 repos  if deploying from main only
+#   -  8 repos  if deploying from main + development
+#
+# After apply, each group produces its own client_id.
+# Store it as AZURE_CLIENT_ID_<GROUP> at org level, or as AZURE_CLIENT_ID
+# at the individual repo level.
+# -----------------------------------------------------------------------------
+
+app_registrations = {
+
+  "frontend" = {
+    repos = [
+      "your-frontend-repo-1",
+      "your-frontend-repo-2",
+      "your-frontend-repo-3",
+      "your-frontend-repo-4",
+      "your-frontend-repo-5",
+      "your-frontend-repo-6",
+    ]
+    # branches defaults to ["main"] — override here if needed:
+    branches = ["main", "development"]
+  }
+
+  "backend" = {
+    repos = [
+      "your-backend-repo-1",
+      "your-backend-repo-2",
+      "your-backend-repo-3",
+      "your-backend-repo-4",
+      "your-backend-repo-5",
+      "your-backend-repo-6",
+      "your-iac-repo",
+      "your-backend-repo-7",
+      "your-backend-repo-8",
+    ]
+
+    branches = ["main", "development"]
+  }
+
+  # Add more groups as your repo count grows:
+  # "data" = {
+  #   repos = ["imovelle-analytics", "imovelle-reporting"]
+  # }
+}
